@@ -9,26 +9,27 @@ Zamonaviy va qulay fast-food shoxobchalari uchun mo'ljallangan boshqaruv tizimi.
 - **Hisobotlar**: Kunlik/haftalik savdo hisobotlari va Excelga eksport qilish.
 - **Boshqaruv**: Maxsulotlar, kategoriyalar, stollar va ishchilarni oson boshqarish.
 - **PWA (Mobile App)**: Telefoningizga ilova sifatida o'rnatib olish imkoniyati.
+- **Docker Ready**: Loyihani Docker orqali bitta buyruqda ishga tushirish imkoniyati.
 - **Offline Ishlash**: Internet bo'lmasa ham tizim to'liq ishlaydi.
 
 ## 🛠 Texnologiyalar
 
-- **Backend**: PHP 7.4+
-- **Database**: SQLite (Hech qanday murakkab sozlashlarsiz ishlaydi)
+- **Backend**: PHP 8.1+
+- **Database**: SQLite
 - **Frontend**: HTML5, CSS3, JavaScript, Bootstrap 5
-- **Icons**: Bootstrap Icons
-- **LOGIN/Pass**: admin/1
+- **Containerization**: Docker & Docker Compose
+
 ## 📦 O'rnatish
 
-1. [OpenServer](https://ospanels.io/) yoki shunga o'xshash PHP server o'rnating.
-2. Ushbu repozitoriyani `domains` papkasiga yuklab oling.
-3. Brauzerda `http://food` manziliga kiring.
+1. Repozitoriyani klon qiling: `git clone https://github.com/sherzodshef19/fastfooduzbek.git`
+2. Docker orqali ishga tushiring: `docker-compose up -d`
+3. Brauzerda `http://localhost:8080` manziliga kiring.
 
-Batafsil ma'lumot uchun [INSTALL.md](INSTALL.md) fayliga qarang.
+Yoki OpenServer yordamida `http://food` manzilida ishlating.
 
 ## 📱 PWA (Telefonga o'rnatish)
 
-Brauzerda saytga kirganingizda, menyudan "Add to Home Screen" (Ekraningizga qo'shish) tugmasini bosing va tizimdan ilova kabi foydalaning.
+Brauzerda saytga kirganingizda, menyudan "Add to Home Screen" tugmasini bosing va tizimdan ilova kabi foydalaning.
 
 ---
 Yaratuvchi: [Sherzod](https://github.com/sherzodshef19)
