@@ -17,7 +17,7 @@ Zamonaviy va qulay fast-food shoxobchalari uchun mo'ljallangan boshqaruv tizimi.
 - **Database**: SQLite (Hech qanday murakkab sozlashlarsiz ishlaydi)
 - **Frontend**: HTML5, CSS3, JavaScript, Bootstrap 5
 - **Icons**: Bootstrap Icons
- LOGIN/Pass: admin/1
+- **LOGIN/Pass**: admin/1
 ## 📦 O'rnatish
 
 1. [OpenServer](https://ospanels.io/) yoki shunga o'xshash PHP server o'rnating.
