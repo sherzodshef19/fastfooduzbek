@@ -1,0 +1,11 @@
+# Database
+database.sqlite
+
+# Media/Uploads
+assets/uploads/*
+!assets/uploads/.gitkeep
+
+# OSPanel specific
+.idea/
+.vscode/
+*.log
