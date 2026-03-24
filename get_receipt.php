@@ -1,6 +1,16 @@
 <?php
 include 'includes/db.php';
 
+// Fetch settings
+$settings_raw = $db->query("SELECT * FROM settings")->fetchAll(PDO::FETCH_ASSOC);
+$settings = [];
+foreach ($settings_raw as $s) {
+    $settings[$s['key']] = $s['value'];
+}
+$store_name = $settings['store_name'] ?? 'FAST FOOD';
+$store_address = $settings['store_address'] ?? 'Toshkent sh., Chilonzor';
+$store_phone = $settings['store_phone'] ?? '+998 90 123 45 67';
+
 $order_id = $_GET['order_id'] ?? $_GET['id'] ?? null;
 if (!$order_id) die("No order ID");
 
@@ -21,9 +31,9 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px;">
-    <strong>FAST FOOD</strong><br>
-    Toshkent sh., Chilonzor<br>
-    Tel: +998 90 123 45 67
+    <strong style="font-size: 16px;"><?= $store_name ?></strong><br>
+    <?= $store_address ?><br>
+    Tel: <?= $store_phone ?>
 </div>
 
 <div style="font-size: 12px; margin-bottom: 10px;">

@@ -71,6 +71,27 @@ try {
         $stmt->execute(['admin', password_hash('admin123', PASSWORD_DEFAULT), 'admin']);
         $stmt->execute(['kassir', password_hash('kassir123', PASSWORD_DEFAULT), 'kassir']);
     }
+    
+    // Settings table
+    $db->exec("CREATE TABLE IF NOT EXISTS settings (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        key TEXT UNIQUE NOT NULL,
+        value TEXT NOT NULL
+    )");
+
+    // Default settings
+    $default_settings = [
+        ['kassa_printer_ip', '127.0.0.1'],
+        ['cook_printer_ip', '127.0.0.1'],
+        ['store_name', 'FAST FOOD'],
+        ['store_address', 'Toshkent sh., Chilonzor'],
+        ['store_phone', '+998 90 123 45 67']
+    ];
+
+    foreach ($default_settings as $setting) {
+        $stmt = $db->prepare("INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)");
+        $stmt->execute($setting);
+    }
 
 } catch (PDOException $e) {
     die("Database connection failed: " . $e->getMessage());

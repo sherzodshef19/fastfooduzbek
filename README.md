@@ -18,6 +18,7 @@ Zamonaviy va qulay fast-food shoxobchalari uchun mo'ljallangan boshqaruv tizimi.
 - **Database**: SQLite
 - **Frontend**: HTML5, CSS3, JavaScript, Bootstrap 5
 - **Containerization**: Docker & Docker Compose
+- **LOGIN/PASS**: admin/1
 
 ## 📦 O'rnatish
 

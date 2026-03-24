@@ -154,19 +154,48 @@ if ($role !== 'admin') {
             <div class="modal-body p-4" id="receipt-content"></div>
             <div class="modal-footer border-0 p-4 pt-0">
                 <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">Yopish</button>
-                <button type="button" class="btn btn-primary rounded-3 px-4" onclick="window.print()">Print</button>
+                <button type="button" class="btn btn-primary rounded-3 px-4" onclick="printReceipt()">Print</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+let last_receipt_order_id = null;
 function showReceipt(orderId) {
+    last_receipt_order_id = orderId;
     fetch('get_receipt.php?order_id=' + orderId)
     .then(res => res.text())
     .then(html => {
         document.getElementById('receipt-content').innerHTML = html;
         new bootstrap.Modal(document.getElementById('receiptModal')).show();
+    });
+}
+
+function printReceipt() {
+    if (!last_receipt_order_id) return;
+
+    const printBtn = document.querySelector('#receiptModal .btn-primary');
+    const originalText = printBtn.innerHTML;
+    printBtn.disabled = true;
+    printBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>...';
+
+    // 1. Server-side print
+    fetch('print_handler.php?order_id=' + last_receipt_order_id)
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            console.log("Printing started:", data.results);
+            // Optionally close the modal on success
+            bootstrap.Modal.getInstance(document.getElementById('receiptModal')).hide();
+        } else {
+            alert("Printer xatosi: " + data.message);
+        }
+    })
+    .catch(err => console.error("Print error:", err))
+    .finally(() => {
+        printBtn.disabled = false;
+        printBtn.innerHTML = originalText;
     });
 }
 </script>

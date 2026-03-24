@@ -14,11 +14,37 @@ foreach ($products as $p) {
 ?>
 
 <style>
+    /* POS Monoblock Optimization */
+    .navbar { display: none !important; } /* Hide standard navbar on Kassa */
+    body { padding-top: 0 !important; overflow: hidden; height: 100vh; }
+    .container { max-width: 100% !important; padding: 0 15px !important; }
+
+    .pos-header {
+        height: 60px;
+        background: white;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 66.666%; /* Only take up the product area width */
+        z-index: 1040;
+    }
+    
+    .pos-content {
+        margin-top: 60px;
+        height: calc(100vh - 60px);
+        overflow-y: auto;
+        padding-bottom: 50px;
+    }
+    
     .category-scroll {
         display: flex;
         overflow-x: auto;
-        padding-bottom: 10px;
-        gap: 12px;
+        padding-bottom: 5px;
+        gap: 8px;
         scrollbar-width: none;
     }
     .category-scroll::-webkit-scrollbar { display: none; }
@@ -27,206 +53,201 @@ foreach ($products as $p) {
         background: white;
         color: var(--dark-color);
         white-space: nowrap;
-        border-radius: 16px;
-        padding: 10px 24px;
+        border-radius: 12px;
+        padding: 12px 20px;
         font-weight: 600;
         border: 1px solid rgba(0,0,0,0.05);
+        font-size: 0.9rem;
     }
     .nav-pills .nav-link.active {
         background: var(--primary-gradient);
         color: white;
-        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
     }
 
     .product-card {
-        border-radius: 28px;
-        border: 1px solid rgba(255,255,255,0.6);
-        background: rgba(255,255,255,0.8);
+        border-radius: 20px;
+        border: 1px solid rgba(0,0,0,0.05);
+        background: white;
         overflow: hidden;
         cursor: pointer;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        transition: transform 0.2s ease;
     }
-    .product-card:hover {
-        transform: translateY(-8px) scale(1.02);
-        box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-    }
+    .product-card:active { transform: scale(0.95); }
+    
     .product-img-container {
         position: relative;
-        height: 140px;
+        height: 100px;
         overflow: hidden;
     }
-    .product-card img {
-        transition: transform 0.6s ease;
-    }
-    .product-card:hover img {
-        transform: scale(1.1);
-    }
-    .btn-add-quick {
-        position: absolute;
-        bottom: 10px;
-        right: 10px;
-        width: 35px;
-        height: 35px;
-        border-radius: 12px;
-        background: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        color: var(--primary-color);
-        opacity: 0;
-        transform: translateY(10px);
-        transition: all 0.3s ease;
-    }
-    .product-card:hover .btn-add-quick {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
+    
     .cart-sidebar {
         background: white;
-        border-radius: 32px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+        border-left: 1px solid rgba(0,0,0,0.05);
         display: flex;
         flex-direction: column;
-        height: calc(100vh - 120px);
-        position: sticky;
-        top: 100px;
+        height: 100vh;
+        position: fixed;
+        right: 0;
+        top: 0;
+        width: 33.333%;
+        z-index: 1050;
     }
+    
+    .cart-container {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 15px;
+    }
+
     .cart-item {
         background: #F8F9FA;
-        border-radius: 18px;
-        padding: 12px;
-        margin-bottom: 12px;
-        transition: all 0.3s ease;
+        border-radius: 15px;
+        padding: 10px;
+        margin-bottom: 10px;
     }
-    .cart-item:hover {
+
+    .quantity-controls .btn-qty {
+        width: 32px;
+        height: 32px;
+        font-size: 1.2rem;
+    }
+
+    .pos-footer-btns {
+        padding: 15px;
         background: white;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        border-top: 1px solid rgba(0,0,0,0.05);
     }
-    .quantity-controls {
-        background: white;
-        border-radius: 12px;
-        padding: 4px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-    }
-    .btn-qty {
-        width: 28px;
-        height: 28px;
-        border-radius: 8px;
-        border: none;
-        background: #F0F2F5;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        transition: all 0.2s;
-    }
-    .btn-qty:hover {
-        background: var(--primary-color);
-        color: white;
-    }
-    .table-busy {
-        background: rgba(255, 107, 107, 0.2) !important;
-        border: 1px solid #FF6B6B !important;
-    }
+
+    .extra-small { font-size: 0.75rem; }
+    .fw-800 { font-weight: 800; }
 </style>
 
 
-<div class="row g-4 mb-5">
-    <div class="col-lg-8">
-        <!-- Categories Section -->
-        <div class="mb-4">
-            <h5 class="fw-bold mb-3">Bo'limlar</h5>
-            <div class="category-scroll nav nav-pills" id="pills-tab" role="tablist">
-                <button class="nav-link active" id="pills-all-tab" data-bs-toggle="pill" data-bs-target="#pills-all" type="button">Hammasi</button>
+<div class="pos-header">
+    <div class="dropdown me-3">
+        <button class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold" type="button" data-bs-toggle="dropdown" style="background: var(--primary-gradient) !important; border:none;">
+            <i class="bi bi-grid-fill me-2"></i> MENU
+        </button>
+        <ul class="dropdown-menu shadow border-0 mt-2" style="border-radius: 15px;">
+            <li><a class="dropdown-item py-2" href="index.php"><i class="bi bi-calculator me-2"></i> Kassa</a></li>
+            <?php if ($role == 'admin'): ?>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item py-2" href="categories.php"><i class="bi bi-tags me-2"></i> Kategoriyalar</a></li>
+                <li><a class="dropdown-item py-2" href="products.php"><i class="bi bi-box-seam me-2"></i> Mahsulotlar</a></li>
+                <li><a class="dropdown-item py-2" href="tables.php"><i class="bi bi-table me-2"></i> Stollar</a></li>
+                <li><a class="dropdown-item py-2" href="waiters.php"><i class="bi bi-people me-2"></i> Ishchilar</a></li>
+                <li><a class="dropdown-item py-2" href="users.php"><i class="bi bi-person-gear me-2"></i> Foydalanuvchilar</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item py-2" href="reports.php"><i class="bi bi-bar-chart-line me-2"></i> Hisobotlar</a></li>
+                <li><a class="dropdown-item py-2" href="settings.php"><i class="bi bi-gear me-2"></i> So'zlamalar</a></li>
+            <?php endif; ?>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item py-2 text-danger" href="logout.php"><i class="bi bi-box-arrow-right me-2"></i> Chiqish</a></li>
+        </ul>
+    </div>
+    <a class="navbar-brand me-auto fw-800" href="index.php" style="background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">FAST FOOD</a>
+    <div class="d-flex align-items-center">
+        <span class="badge bg-light text-dark me-2 py-2 px-3 border" id="pos-waiter-display">Ishchi: -</span>
+        <span class="badge bg-light text-dark py-2 px-3 border" id="pos-table-display">Stol: -</span>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row g-0">
+        <!-- Products Area -->
+        <div class="col-lg-8 pe-3 pos-content">
+            <!-- Categories Section -->
+            <div class="mb-4">
+                <div class="category-scroll nav nav-pills" id="pills-tab" role="tablist">
+                    <button class="nav-link active" id="pills-all-tab" data-bs-toggle="pill" data-bs-target="#pills-all" type="button">Hammasi</button>
+                    <?php foreach ($categories as $cat): ?>
+                        <button class="nav-link" id="pills-cat-<?= $cat['id'] ?>-tab" data-bs-toggle="pill" data-bs-target="#pills-cat-<?= $cat['id'] ?>" type="button"><?= $cat['name'] ?></button>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <!-- Products Section -->
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade show active" id="pills-all">
+                    <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
+                        <?php foreach ($products as $p): ?>
+                            <?= renderProductCard($p) ?>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
                 <?php foreach ($categories as $cat): ?>
-                    <button class="nav-link" id="pills-cat-<?= $cat['id'] ?>-tab" data-bs-toggle="pill" data-bs-target="#pills-cat-<?= $cat['id'] ?>" type="button"><?= $cat['name'] ?></button>
+                    <div class="tab-pane fade" id="pills-cat-<?= $cat['id'] ?>">
+                        <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
+                            <?php if (isset($products_by_cat[$cat['id']])): ?>
+                                <?php foreach ($products_by_cat[$cat['id']] as $p): ?>
+                                    <?= renderProductCard($p) ?>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <div class="col-12 text-center text-muted py-5">
+                                    <i class="bi bi-box2 fs-1 d-block mb-3"></i>
+                                    Hozircha mahsulot yo'q
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
                 <?php endforeach; ?>
             </div>
         </div>
 
-        <!-- Products Section -->
-        <div class="tab-content" id="pills-tabContent">
-            <div class="tab-pane fade show active" id="pills-all">
-                <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-4">
-                    <?php foreach ($products as $p): ?>
-                        <?= renderProductCard($p) ?>
-                    <?php endforeach; ?>
+        <!-- Cart Sidebar -->
+        <div class="col-lg-4">
+            <div class="cart-sidebar">
+                <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold m-0"><i class="bi bi-bag-check me-2 text-primary"></i> Savat</h5>
+                    <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2" id="cart-count">0 ta</span>
                 </div>
-            </div>
-            <?php foreach ($categories as $cat): ?>
-                <div class="tab-pane fade" id="pills-cat-<?= $cat['id'] ?>">
-                    <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-4">
-                        <?php if (isset($products_by_cat[$cat['id']])): ?>
-                            <?php foreach ($products_by_cat[$cat['id']] as $p): ?>
-                                <?= renderProductCard($p) ?>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <div class="col-12 text-center text-muted py-5">
-                                <i class="bi bi-box2 fs-1 d-block mb-3"></i>
-                                Hozircha mahsulot yo'q
-                            </div>
-                        <?php endif; ?>
+                
+                <div class="p-3 bg-light-subtle border-bottom">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="form-label extra-small text-muted mb-1">Ishchi</label>
+                            <select id="waiter_id" class="form-select form-select-sm border-0 bg-light rounded-3 py-2" onchange="updatePosDisplay()">
+                                <option value="">Tanlang...</option>
+                                <?php foreach ($waiters as $w): ?>
+                                    <option value="<?= $w['id'] ?>"><?= $w['name'] ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label extra-small text-muted mb-1">Stol / Joy</label>
+                            <select id="table_id" class="form-select form-select-sm border-0 bg-light rounded-3 py-2" onchange="updatePosDisplay()">
+                                <option value="">Tanlang...</option>
+                                    <?php foreach ($tables as $tab): ?>
+                                        <option value="<?= $tab['id'] ?>" class="<?= $tab['is_busy'] ? 'bg-light text-danger fw-bold' : '' ?>">
+                                            <?= $tab['name'] ?> <?= $tab['is_busy'] ? '(Band)' : '(Bo\'sh)' ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                            </select>
+                        </div>
                     </div>
                 </div>
-            <?php endforeach; ?>
-        </div>
-    </div>
 
-    <!-- Cart Sidebar -->
-    <div class="col-lg-4">
-        <div class="cart-sidebar p-4">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h5 class="fw-bold m-0"><i class="bi bi-bag-check me-2 text-primary"></i> Buyurtma</h5>
-                <span class="badge bg-light text-dark rounded-pill px-3 py-2" id="cart-count">0 ta mahsulot</span>
-            </div>
-            
-            <div class="row g-2 mb-4">
-                <div class="col-6">
-                    <label class="form-label extra-small text-muted mb-1">Xizmat ko'rsatuvchi</label>
-                    <select id="waiter_id" class="form-select form-select-sm border-0 bg-light rounded-3 py-2">
-                        <option value="">Tanlang...</option>
-                        <?php foreach ($waiters as $w): ?>
-                            <option value="<?= $w['id'] ?>"><?= $w['name'] ?></option>
-                        <?php endforeach; ?>
-                    </select>
+                <div class="cart-container" id="cart-container">
+                    <div class="text-center py-5 text-muted" id="empty-cart-msg">
+                        <i class="bi bi-cart-x fs-1 d-block mb-2"></i>
+                        Savat bo'sh
+                    </div>
                 </div>
-                <div class="col-6">
-                    <label class="form-label extra-small text-muted mb-1">Stol / Joy</label>
-                    <select id="table_id" class="form-select form-select-sm border-0 bg-light rounded-3 py-2">
-                        <option value="">Tanlang...</option>
-                            <?php foreach ($tables as $tab): ?>
-                                <option value="<?= $tab['id'] ?>" class="<?= $tab['is_busy'] ? 'bg-light text-danger fw-bold' : '' ?>">
-                                    <?= $tab['name'] ?> <?= $tab['is_busy'] ? '(Band)' : '(Bo\'sh)' ?>
-                                </option>
-                            <?php endforeach; ?>
-                    </select>
-                </div>
-            </div>
 
-            <div class="flex-grow-1 overflow-auto mb-4 pe-2" id="cart-container">
-                <div class="text-center py-5 text-muted" id="empty-cart-msg">
-                    <i class="bi bi-cart-x fs-1 d-block mb-2"></i>
-                    Savat bo'sh
-                </div>
-                <!-- Items will be injected here -->
-            </div>
-
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="text-muted fw-bold">Umumiy summa:</span>
-                    <span id="cart-total" class="fs-4 fw-800 text-primary">0 so'm</span>
-                </div>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-primary flex-grow-1 py-3" onclick="submitOrder('active')">
-                        <i class="bi bi-save me-1"></i> Saqlash
-                    </button>
-                    <button class="btn btn-success flex-grow-1 py-3" onclick="submitOrder('paid')">
-                        <i class="bi bi-check2-all me-1"></i> To'lov & Check
-                    </button>
+                <div class="pos-footer-btns">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted fw-bold">JAMI:</span>
+                        <span id="cart-total" class="fs-3 fw-800 text-primary">0 so'm</span>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-primary flex-grow-1 py-3 fw-bold rounded-4" onclick="submitOrder('active')">
+                            <i class="bi bi-save me-1"></i> Saqlash
+                        </button>
+                        <button class="btn btn-primary flex-grow-1 py-3 fw-bold rounded-4 shadow-sm" style="background: var(--primary-gradient) !important;" onclick="submitOrder('paid')">
+                            <i class="bi bi-check2-all me-1"></i> TO'LOV
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -238,26 +259,19 @@ function renderProductCard($p) {
     ob_start();
     ?>
     <div class="col">
-        <div class="product-card h-100" onclick="addToCart(<?= htmlspecialchars(json_encode($p)) ?>)">
+        <div class="product-card h-100 shadow-sm" onclick="addToCart(<?= htmlspecialchars(json_encode($p)) ?>)">
             <div class="product-img-container">
                 <?php if ($p['image']): ?>
                     <img src="assets/uploads/<?= $p['image'] ?>" class="w-100 h-100 object-fit-cover">
                 <?php else: ?>
-                    <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-light bg-gradient">
-                        <i class="bi bi-image text-muted opacity-50" style="font-size: 3rem;"></i>
-                        <span class="extra-small text-muted">Rasm yo'q</span>
+                    <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-light">
+                        <i class="bi bi-image text-muted opacity-50" style="font-size: 2rem;"></i>
                     </div>
                 <?php endif; ?>
-                <div class="btn-add-quick">
-                    <i class="bi bi-plus-lg"></i>
-                </div>
             </div>
-            <div class="card-body p-3">
-                <h6 class="fw-bold mb-1 text-truncate"><?= $p['name'] ?></h6>
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="text-primary fw-bold"><?= number_format($p['price'], 0, '.', ' ') ?></span>
-                    <span class="extra-small text-muted">so'm</span>
-                </div>
+            <div class="card-body p-2 text-center">
+                <h6 class="fw-bold mb-1 small text-truncate"><?= $p['name'] ?></h6>
+                <div class="text-primary fw-bold small"><?= number_format($p['price'], 0, '.', ' ') ?> so'm</div>
             </div>
         </div>
     </div>
@@ -279,7 +293,16 @@ document.addEventListener('DOMContentLoaded', function() {
             resetCart();
         }
     });
+    updatePosDisplay(); // Initial display
 });
+
+function updatePosDisplay() {
+    const waiterText = document.getElementById('waiter_id').options[document.getElementById('waiter_id').selectedIndex].text;
+    const tableText = document.getElementById('table_id').options[document.getElementById('table_id').selectedIndex].text;
+    
+    document.getElementById('pos-waiter-display').innerText = "Ishchi: " + (waiterText === 'Tanlang...' ? '-' : waiterText);
+    document.getElementById('pos-table-display').innerText = "Stol: " + (tableText === 'Tanlang...' ? '-' : tableText.split(' (')[0]);
+}
 
 function checkActiveOrder(tableId) {
     fetch('get_active_order.php?table_id=' + tableId)
@@ -440,7 +463,9 @@ function submitOrder(status = 'active') {
     });
 }
 
+let last_receipt_order_id = null;
 function showReceipt(orderId) {
+    last_receipt_order_id = orderId;
     fetch('get_receipt.php?id=' + orderId)
     .then(res => res.text())
     .then(html => {
@@ -450,14 +475,30 @@ function showReceipt(orderId) {
 }
 
 function printReceipt() {
-    const content = document.getElementById('receipt-content').innerHTML;
-    const printWindow = window.open('', '', 'height=600,width=400');
-    printWindow.document.write('<html><head><title>Check</title>');
-    printWindow.document.write('<style>body{font-family:monospace;padding:20px;}</style></head><body>');
-    printWindow.document.write(content);
-    printWindow.document.write('</body></html>');
-    printWindow.document.close();
-    printWindow.print();
+    if (!last_receipt_order_id) return;
+    
+    const printBtn = document.querySelector('#receiptModal .btn-primary');
+    const originalText = printBtn.innerHTML;
+    printBtn.disabled = true;
+    printBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>...';
+
+    // 1. Server-side print (to both IP printers)
+    fetch('print_handler.php?order_id=' + last_receipt_order_id)
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            console.log("Printing started:", data.results);
+            // Optionally close the modal on success
+            bootstrap.Modal.getInstance(document.getElementById('receiptModal')).hide();
+        } else {
+            alert("Printer xatosi: " + data.message);
+        }
+    })
+    .catch(err => console.error("Print error:", err))
+    .finally(() => {
+        printBtn.disabled = false;
+        printBtn.innerHTML = originalText;
+    });
 }
 </script>
 

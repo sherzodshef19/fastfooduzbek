@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 if (!isset($_SESSION['user_id']) && basename($_SERVER['PHP_SELF']) != 'login.php') {
     header("Location: login.php");
     exit;
@@ -113,9 +115,9 @@ $role = $_SESSION['role'] ?? null;
                 <li class="nav-item"><a class="nav-link <?= basename($_SERVER['PHP_SELF']) == 'tables.php' ? 'active' : '' ?>" href="tables.php">Stollar</a></li>
                 <li class="nav-item"><a class="nav-link <?= basename($_SERVER['PHP_SELF']) == 'waiters.php' ? 'active' : '' ?>" href="waiters.php">Ishchilar</a></li>
                 <li class="nav-item"><a class="nav-link <?= basename($_SERVER['PHP_SELF']) == 'users.php' ? 'active' : '' ?>" href="users.php">Foydalanuvchilar</a></li>
-                <?php endif; ?>
-                <?php if ($role == 'admin'): ?>
+                
                 <li class="nav-item"><a class="nav-link <?= basename($_SERVER['PHP_SELF']) == 'reports.php' ? 'active' : '' ?>" href="reports.php">Hisobot</a></li>
+                <li class="nav-item"><a class="nav-link <?= basename($_SERVER['PHP_SELF']) == 'settings.php' ? 'active' : '' ?>" href="settings.php">So'zlamalar</a></li>
                 <?php endif; ?>
                 
                 <li class="nav-item dropdown ms-lg-3">
