@@ -76,8 +76,8 @@ settings         → id, key, value
 
 | Login | Parol | Rol |
 |---|---|---|
-| `admin` | `admin123` | Admin (to'liq kirish) |
-| `kassir` | `kassir123` | Kassir (faqat kassa) |
+| `admin` | `1` | Admin (to'liq kirish) |
+| `1` | `1` | Kassir (faqat kassa) |
 
 > ⚠️ Birinchi ishga tushirgandan so'ng parollarni o'zgartirishni unutmang!
 
